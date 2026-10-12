@@ -1,0 +1,62 @@
+# ---- secrets ----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+!*.env.example
+
+# ---- python ----
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- models & runtimes (too large for git) ----
+tts/
+asr/
+*.onnx
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.model
+
+# ---- data & runtime ----
+database_snapshot/
+logs/
+*.log
+output/
+tmp/
+.temp/
+
+# ---- competition media ----
+competition_video/
+*.mp4
+*.mov
+*.avi
+screenshots/
+
+# ---- node ----
+node_modules/
+.pnpm-store/
+.next/
+dist/
+
+# ---- ide / os ----
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

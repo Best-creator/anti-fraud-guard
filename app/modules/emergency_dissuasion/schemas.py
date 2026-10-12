@@ -1,0 +1,9 @@
+from pydantic import BaseModel, Field
+
+
+class EmergencyChatRequest(BaseModel):
+    query: str = Field(..., description="用户正在经历的风险场景描述")
+    session_id: str | None = Field(None, description="紧急劝阻会话ID")
+    is_stream: bool = Field(False, description="是否流式返回")
+    intent_hint: str | None = Field("emergency_help", description="入口意图提示")
+

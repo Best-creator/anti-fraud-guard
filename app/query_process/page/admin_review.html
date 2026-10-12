@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>反诈知识接入管理后台</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --panel: #101827;
+      --panel-2: #0f172a;
+      --panel-3: #111d31;
+      --line: #263247;
+      --line-soft: #1d283a;
+      --text: #f8fafc;
+      --muted: #8a94a6;
+      --primary: #2563eb;
+      --primary-hover: #3478ff;
+      --cyan: #22d3ee;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 8px;
+      --sidebar: 286px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+
+    .login-view {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+    .login-box {
+      width: min(420px, calc(100vw - 48px));
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 26px;
+    }
+    .login-brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #05070b;
+      border: 1px solid rgba(255,255,255,0.14);
+      flex: 0 0 auto;
+    }
+    .login-brand strong { display: block; font-size: 18px; }
+    .login-brand strong, .login-brand span { overflow-wrap: anywhere; word-break: break-word; }
+    .login-brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    .field { display: grid; gap: 7px; margin-bottom: 14px; }
+    label { color: #c7d0dd; font-size: 13px; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: #0c1220;
+      outline: none;
+    }
+    input, select { height: 40px; padding: 0 12px; }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      padding: 11px 12px;
+      line-height: 1.55;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn {
+      min-height: 38px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 13px;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn.secondary { background: #0c1220; border-color: var(--line); color: #d7deea; }
+    .btn.secondary:hover { background: #111a2b; }
+    .btn.danger { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.5); color: #fecaca; }
+    .btn.warning { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.5); color: #fde68a; }
+    .btn.success { background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.5); color: #bbf7d0; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .hint { color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; word-break: break-word; }
+    .hint, label, .btn, input, textarea, select { min-width: 0; }
+    .error { color: #fecaca; font-size: 13px; min-height: 20px; }
+
+    .console {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      min-width: 0;
+    }
+    .sidebar {
+      min-width: 0;
+      min-height: 100vh;
+      background: #080c13;
+      border-right: 1px solid var(--line-soft);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+    .side-brand {
+      min-width: 0;
+      padding: 18px 16px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .side-brand strong { display: block; font-size: 15px; }
+    .side-brand span { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; overflow-wrap: anywhere; }
+    .nav {
+      padding: 12px 10px;
+      display: grid;
+      align-content: start;
+      gap: 6px;
+    }
+    .nav-btn {
+      width: 100%;
+      min-height: 40px;
+      border: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      color: #dbe3ef;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 11px;
+      text-align: left;
+    }
+    .nav-btn:hover, .nav-btn.active { background: #111a2b; }
+    .nav-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex: 0 0 auto;
+    }
+    .nav-btn.active .nav-dot { background: var(--cyan); }
+    .side-foot {
+      border-top: 1px solid var(--line-soft);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .main {
+      min-width: 0;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+    .topbar {
+      min-width: 0;
+      min-height: 64px;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .top-title strong { display: block; font-size: 18px; }
+    .top-title span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .content {
+      min-width: 0;
+      padding: 18px 22px 28px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      padding: 13px;
+      min-height: 76px;
+    }
+    .metric span { color: var(--muted); font-size: 12px; }
+    .metric strong { display: block; margin-top: 8px; font-size: 25px; line-height: 1; }
+
+    .view { display: none; }
+    .view.active { display: grid; gap: 14px; }
+    .toolbar {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .split {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 14px;
+      min-height: 620px;
+    }
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .panel-head {
+      min-height: 48px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .panel-head strong { font-size: 14px; }
+    .panel-body { padding: 14px; }
+    .list {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      max-height: 720px;
+      overflow: auto;
+      padding: 12px;
+    }
+    .item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #0c1220;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .item.selectable { cursor: pointer; }
+    .item.selectable:hover, .item.selected { border-color: rgba(34, 211, 238, 0.65); background: #111a2b; }
+    .item-title { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .item-title strong { min-width: 0; word-break: break-word; font-size: 14px; }
+    .meta { color: var(--muted); font-size: 12px; line-height: 1.6; word-break: break-word; }
+    .badge {
+      min-height: 24px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      color: #cbd5e1;
+      background: #0b111d;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .badge.ok { color: #bbf7d0; border-color: rgba(34, 197, 94, 0.5); }
+    .badge.warn { color: #fde68a; border-color: rgba(245, 158, 11, 0.5); }
+    .badge.bad { color: #fecaca; border-color: rgba(239, 68, 68, 0.5); }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .kv {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #0c1220;
+      padding: 10px;
+      min-height: 62px;
+    }
+    .kv span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    .kv strong { font-size: 13px; word-break: break-word; }
+    .json-editor {
+      min-height: 420px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+      overflow: auto;
+    }
+    .empty {
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.7;
+      padding: 24px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .code {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #080c13;
+      padding: 10px;
+      color: #cbd5e1;
+      overflow: auto;
+      max-height: 220px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 980px) {
+      .console { grid-template-columns: 1fr; }
+      .sidebar { min-height: auto; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .side-foot { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; }
+      .stats, .cards, .grid-2 { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .side-foot .btn, .row .btn { width: 100%; }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 480px) {
+      .login-view { padding: 14px; }
+      .login-box { width: calc(100vw - 28px); padding: 22px; }
+    }
+  
+    /* 柔色扁平主题覆盖 */
+    :root {
+      --bg: #f6f4ef;
+      --panel: #fffdf9;
+      --panel-2: #fbf7ef;
+      --panel-3: #f8f2e9;
+      --soft: #fbf7ef;
+      --line: #e3ded5;
+      --line-soft: #e9e3d8;
+      --text: #263238;
+      --muted: #6c7875;
+      --primary: #4b9a96;
+      --primary-hover: #3f8581;
+      --cyan: #6faeaa;
+      --success: #4d8b63;
+      --warning: #b4863f;
+      --danger: #c55a62;
+      --header: #fbf7ef;
+      --radius: 8px;
+    }
+
+    body {
+      background: var(--bg) !important;
+      color: var(--text) !important;
+    }
+
+    .topbar,
+    .sidebar,
+    .side-foot,
+    .panel-head,
+    .toolbar,
+    .main-head,
+    .header,
+    .card-head {
+      background: #fbf7ef !important;
+      color: var(--text) !important;
+      border-color: var(--line) !important;
+      box-shadow: none !important;
+    }
+
+    .shell,
+    .app,
+    .main,
+    .login-view,
+    .content,
+    .messages {
+      background: var(--bg) !important;
+    }
+
+    .panel,
+    .card,
+    .login-box,
+    .step,
+    .metric,
+    .feedback,
+    .scenario,
+    .warn-box,
+    .actions .item,
+    .table-wrap,
+    .upload-card,
+    .form-card,
+    .result-card,
+    .side-card,
+    .stat-card,
+    .review-card,
+    .profile-card,
+    .bubble {
+      background: var(--panel) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+
+    input,
+    textarea,
+    select {
+      background: #fffdf9 !important;
+      color: var(--text) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #8cc8c2 !important;
+      outline: 2px solid rgba(75, 154, 150, 0.14) !important;
+      outline-offset: 0;
+    }
+
+    button,
+    .nav a,
+    .profile-link,
+    .ghost-btn,
+    .option-btn,
+    .secondary-btn,
+    .link-btn {
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+
+    .primary-btn,
+    .send-btn,
+    .nav a.active,
+    .submit-btn,
+    .login-btn,
+    .import-btn,
+    .save-btn,
+    .option-btn.selected {
+      background: var(--primary) !important;
+      border-color: var(--primary) !important;
+      color: #fff !important;
+      box-shadow: none !important;
+    }
+
+    .primary-btn:hover,
+    .send-btn:hover,
+    .submit-btn:hover,
+    .login-btn:hover,
+    .import-btn:hover,
+    .save-btn:hover {
+      background: var(--primary-hover) !important;
+      border-color: var(--primary-hover) !important;
+    }
+
+    .ghost-btn,
+    .option-btn,
+    .secondary-btn,
+    .quick button,
+    .nav a,
+    .profile-link,
+    .link-btn {
+      background: #fffdf9 !important;
+      color: var(--text) !important;
+      border-color: var(--line) !important;
+    }
+
+    .ghost-btn:hover,
+    .option-btn:hover,
+    .quick button:hover,
+    .nav a:hover,
+    .profile-link:hover,
+    .link-btn:hover {
+      background: #e7f3f0 !important;
+      color: #1d5f5b !important;
+      border-color: #bcdcd7 !important;
+    }
+
+    .mark,
+    .avatar,
+    .badge {
+      background: #e7f3f0 !important;
+      color: #1d5f5b !important;
+      border-color: #bcdcd7 !important;
+    }
+
+    .avatar.bot,
+    .warn-box,
+    .nav a.emergency,
+    .msg.user .bubble {
+      background: #fff0e9 !important;
+      color: #8b3b42 !important;
+      border-color: #f0c9bd !important;
+    }
+
+    .msg.user .bubble,
+    .send-btn.danger,
+    .nav a.active.emergency {
+      background: var(--danger) !important;
+      border-color: var(--danger) !important;
+      color: #fff !important;
+    }
+
+    label,
+    .muted,
+    .meta,
+    .brand span,
+    .panel-head span,
+    .metric span,
+    .step span {
+      color: var(--muted) !important;
+    }
+
+    table,
+    th,
+    td {
+      border-color: var(--line) !important;
+    }
+
+    th {
+      background: #fbf7ef !important;
+      color: var(--text) !important;
+    }
+    /* Competition showcase polish: a clearer governance console with strong status hierarchy. */
+    :root {
+      --bg: #eef3f7;
+      --panel: #ffffff;
+      --panel-2: #f7fafc;
+      --panel-3: #edf4f7;
+      --line: #d6e0e6;
+      --line-soft: #e2e9ee;
+      --text: #17242b;
+      --muted: #62717b;
+      --primary: #247c7a;
+      --primary-hover: #1b6866;
+      --cyan: #2ca7b8;
+      --success: #2f855a;
+      --warning: #b7791f;
+      --danger: #c53030;
+      --radius: 8px;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 16% 8%, rgba(44, 167, 184, 0.16), transparent 28%),
+        radial-gradient(circle at 92% 22%, rgba(183, 121, 31, 0.12), transparent 24%),
+        var(--bg) !important;
+      color: var(--text) !important;
+    }
+
+    .console {
+      background: var(--bg) !important;
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, #0b1522, #101926) !important;
+      border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #ecf5f7 !important;
+      box-shadow: 14px 0 34px rgba(20, 35, 44, 0.12) !important;
+    }
+
+    .side-brand,
+    .side-foot {
+      background: transparent !important;
+      border-color: rgba(255, 255, 255, 0.09) !important;
+      color: #ecf5f7 !important;
+    }
+
+    .side-brand strong,
+    .side-foot .hint {
+      color: #f7fbfc !important;
+    }
+
+    .side-brand span {
+      color: rgba(236, 245, 247, 0.66) !important;
+    }
+
+    .nav-btn {
+      color: rgba(236, 245, 247, 0.78) !important;
+      border: 1px solid transparent !important;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: rgba(44, 167, 184, 0.14) !important;
+      border-color: rgba(44, 167, 184, 0.24) !important;
+      color: #ffffff !important;
+    }
+
+    .nav-dot {
+      background: rgba(236, 245, 247, 0.38) !important;
+    }
+
+    .nav-btn.active .nav-dot {
+      background: #38d2c8 !important;
+      box-shadow: 0 0 0 4px rgba(56, 210, 200, 0.12);
+    }
+
+    .main {
+      background: transparent !important;
+    }
+
+    .topbar {
+      min-height: 72px !important;
+      background: rgba(255, 255, 255, 0.92) !important;
+      border-bottom: 1px solid var(--line) !important;
+      box-shadow: 0 12px 28px rgba(50, 69, 78, 0.07) !important;
+      backdrop-filter: blur(16px);
+    }
+
+    .top-title strong {
+      color: #14252d !important;
+      font-size: 20px !important;
+    }
+
+    .top-title span {
+      color: #667783 !important;
+      font-size: 13px !important;
+    }
+
+    .content {
+      padding: 22px 26px 30px !important;
+      gap: 16px !important;
+    }
+
+    .stats {
+      grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+      gap: 12px !important;
+    }
+
+    .metric {
+      position: relative;
+      overflow: hidden;
+      min-height: 88px !important;
+      border: 1px solid var(--line) !important;
+      border-top: 4px solid #2ca7b8 !important;
+      background: #ffffff !important;
+      color: var(--text) !important;
+      box-shadow: 0 14px 30px rgba(44, 65, 76, 0.08) !important;
+    }
+
+    .metric:nth-child(2) { border-top-color: #d9913d !important; }
+    .metric:nth-child(3) { border-top-color: #4d7ec9 !important; }
+    .metric:nth-child(4) { border-top-color: #2f855a !important; }
+    .metric:nth-child(5) { border-top-color: #805ad5 !important; }
+    .metric:nth-child(6) { border-top-color: #c53030 !important; }
+
+    .metric span {
+      color: #667783 !important;
+      font-size: 12px !important;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      color: #13252d !important;
+      font-size: 30px !important;
+      letter-spacing: 0 !important;
+    }
+
+    .toolbar,
+    .panel,
+    .card,
+    .login-box {
+      background: #ffffff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--text) !important;
+      box-shadow: 0 16px 34px rgba(44, 65, 76, 0.07) !important;
+    }
+
+    .toolbar {
+      align-items: center !important;
+      padding: 13px 14px !important;
+    }
+
+    .split {
+      grid-template-columns: minmax(320px, 0.38fr) minmax(0, 1fr) !important;
+      min-height: calc(100vh - 260px) !important;
+    }
+
+    .panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      background: #f7fafc !important;
+      border-bottom: 1px solid var(--line) !important;
+      color: var(--text) !important;
+    }
+
+    .panel-head strong {
+      color: #17242b !important;
+      font-size: 15px !important;
+    }
+
+    .panel-body,
+    .list {
+      background: #ffffff !important;
+    }
+
+    .list {
+      max-height: calc(100vh - 320px) !important;
+      padding: 12px !important;
+    }
+
+    .item {
+      position: relative;
+      border: 1px solid var(--line) !important;
+      border-left: 4px solid #9fb4bf !important;
+      background: #ffffff !important;
+      color: var(--text) !important;
+      box-shadow: 0 10px 22px rgba(44, 65, 76, 0.06) !important;
+    }
+
+    .item.selectable:hover,
+    .item.selected {
+      border-color: #8fcdd4 !important;
+      border-left-color: #2ca7b8 !important;
+      background: #f0fbfb !important;
+      box-shadow: 0 14px 28px rgba(44, 127, 135, 0.13) !important;
+    }
+
+    .item-title strong,
+    .kv strong {
+      color: #182b33 !important;
+    }
+
+    .meta,
+    .hint,
+    label,
+    .kv span,
+    .panel-head span,
+    .metric span {
+      color: var(--muted) !important;
+    }
+
+    .kv,
+    .code,
+    .empty {
+      border: 1px solid var(--line) !important;
+      background: #f8fbfc !important;
+      color: var(--text) !important;
+      border-radius: 8px !important;
+    }
+
+    .code,
+    .json-editor {
+      background: #0f1824 !important;
+      color: #d6e6ef !important;
+      border-color: rgba(15, 24, 36, 0.18) !important;
+    }
+
+    .badge {
+      min-height: 26px !important;
+      border-radius: 999px !important;
+      background: #edf4f7 !important;
+      border: 1px solid #cad9df !important;
+      color: #4a5b65 !important;
+      font-weight: 700;
+    }
+
+    .badge.ok {
+      background: #e6f6ed !important;
+      border-color: #a9d8ba !important;
+      color: #22633d !important;
+    }
+
+    .badge.warn {
+      background: #fff4df !important;
+      border-color: #e8c47f !important;
+      color: #7a520b !important;
+    }
+
+    .badge.bad {
+      background: #ffe9e9 !important;
+      border-color: #e7abab !important;
+      color: #9c2a2a !important;
+    }
+
+    input,
+    textarea,
+    select {
+      background: #ffffff !important;
+      border: 1px solid #cfdbe2 !important;
+      color: var(--text) !important;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #2ca7b8 !important;
+      box-shadow: 0 0 0 3px rgba(44, 167, 184, 0.16) !important;
+      outline: none !important;
+    }
+
+    .btn {
+      background: #247c7a !important;
+      border-color: #247c7a !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: none !important;
+    }
+
+    .btn:hover {
+      background: #1b6866 !important;
+      border-color: #1b6866 !important;
+    }
+
+    .btn.secondary {
+      background: #f7fafc !important;
+      border-color: #cfdbe2 !important;
+      color: #263942 !important;
+    }
+
+    .btn.secondary:hover {
+      background: #e8f5f5 !important;
+      border-color: #9bd4d2 !important;
+      color: #125b58 !important;
+    }
+
+    .btn.success {
+      background: #e6f6ed !important;
+      border-color: #8dcda5 !important;
+      color: #22633d !important;
+    }
+
+    .btn.warning {
+      background: #fff4df !important;
+      border-color: #e8c47f !important;
+      color: #7a520b !important;
+    }
+
+    .btn.danger {
+      background: #ffe9e9 !important;
+      border-color: #e7abab !important;
+      color: #9c2a2a !important;
+    }
+
+    .avatar {
+      background: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.42) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14) !important;
+    }
+
+    .login-view {
+      background:
+        radial-gradient(circle at 24% 18%, rgba(44, 167, 184, 0.20), transparent 28%),
+        linear-gradient(180deg, #101926, #0b1522) !important;
+    }
+
+    .login-box {
+      border-color: rgba(255, 255, 255, 0.14) !important;
+      background: rgba(255, 255, 255, 0.94) !important;
+    }
+
+    body.capture-mode *,
+    body.capture-mode *::before,
+    body.capture-mode *::after {
+      animation: none !important;
+      transition-duration: 0s !important;
+      scroll-behavior: auto !important;
+    }
+
+    @media (max-width: 1160px) {
+      .stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      .split {
+        min-height: 0 !important;
+      }
+
+      .list {
+        max-height: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="login-view" id="loginView">
+    <form class="login-box" id="loginForm">
+      <div class="login-brand">
+        <img class="avatar" src="assets/owl-shield-avatar.png" alt="智能反诈助手头像">
+        <div>
+          <strong>反诈知识接入管理后台</strong>
+          <span>审核 · 发布 · 版本回滚</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="username">管理员账号</label>
+        <input id="username" name="username" autocomplete="username" placeholder="请输入账号">
+      </div>
+      <div class="field">
+        <label for="password">管理员密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+      </div>
+      <button class="btn" type="submit" style="width:100%;">登录后台</button>
+      <p class="hint">仅管理员可访问。提交入口产生的内容必须经过审核、发布校验后才会写入正式知识库。</p>
+      <div class="error" id="loginError"></div>
+    </form>
+  </section>
+
+  <section class="console hidden" id="consoleView">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <img class="avatar" src="assets/owl-shield-avatar.png" alt="智能反诈助手头像">
+        <div>
+          <strong>知识接入后台</strong>
+          <span>管理员统一工作台</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" type="button" data-tab="reviews"><span class="nav-dot"></span><span>人工审核</span></button>
+        <button class="nav-btn" type="button" data-tab="reports"><span class="nav-dot"></span><span>举报中心</span></button>
+        <button class="nav-btn" type="button" data-tab="publish"><span class="nav-dot"></span><span>发布中心</span></button>
+        <button class="nav-btn" type="button" data-tab="versions"><span class="nav-dot"></span><span>版本回滚</span></button>
+        <button class="nav-btn" type="button" data-tab="audit"><span class="nav-dot"></span><span>审计概览</span></button>
+      </nav>
+      <div class="side-foot">
+        <div class="hint" id="userInfo">未登录</div>
+        <div class="row">
+          <a class="btn secondary" href="http://127.0.0.1:8000/import.html" target="_blank" rel="noopener">提交入口</a>
+          <button class="btn secondary" id="logoutBtn" type="button">退出</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="top-title">
+          <strong id="pageTitle">人工审核</strong>
+          <span id="pageSubtitle">查看待审核草稿，修改 Agent 结构化结果并作出审核结论</span>
+        </div>
+        <div class="row">
+          <span class="badge ok" id="apiState">已登录</span>
+          <button class="btn secondary" id="refreshAllBtn" type="button">刷新</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="stats">
+          <div class="metric"><span>待审核</span><strong id="statPending">0</strong></div>
+          <div class="metric"><span>待处理举报</span><strong id="statReports">0</strong></div>
+          <div class="metric"><span>待发布</span><strong id="statReady">0</strong></div>
+          <div class="metric"><span>正式知识</span><strong id="statKnowledge">0</strong></div>
+          <div class="metric"><span>版本数</span><strong id="statVersions">0</strong></div>
+          <div class="metric"><span>规则候选</span><strong id="statRules">0</strong></div>
+        </div>
+
+        <section class="view active" id="view-reviews">
+          <div class="toolbar">
+            <div class="row">
+              <select id="reviewStatus">
+                <option value="pending_review">待审核</option>
+                <option value="need_more_info">要求补充</option>
+                <option value="approved">已审核通过</option>
+                <option value="rejected">已驳回</option>
+                <option value="published">已发布</option>
+                <option value="">全部</option>
+              </select>
+              <button class="btn secondary" id="loadReviewsBtn" type="button">刷新审核队列</button>
+            </div>
+            <span class="hint">通过前可直接修改 Agent 结构化草稿；通过后只生成发布包，不会自动发布。</span>
+          </div>
+          <div class="split">
+            <div class="panel">
+              <div class="panel-head"><strong>审核队列</strong><span class="badge" id="reviewCount">0</span></div>
+              <div class="list" id="reviewList"><div class="empty">暂无审核任务</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <strong>审核详情</strong>
+                <span class="badge" id="reviewDetailStatus">未选择</span>
+              </div>
+              <div class="panel-body" id="reviewDetail"><div class="empty">请选择左侧审核任务</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-reports">
+          <div class="toolbar">
+            <div class="row">
+              <select id="reportStatus">
+                <option value="confirmed">待处理</option>
+                <option value="handled">已处理</option>
+                <option value="invalid">无效举报</option>
+                <option value="">全部</option>
+              </select>
+              <button class="btn secondary" id="loadReportsBtn" type="button">刷新举报中心</button>
+            </div>
+            <span class="hint">这里展示聊天页“可疑链接 / 内容一键举报”确认后的正式举报记录。</span>
+          </div>
+          <div class="split">
+            <div class="panel">
+              <div class="panel-head"><strong>举报列表</strong><span class="badge" id="reportCount">0</span></div>
+              <div class="list" id="reportList"><div class="empty">暂无举报记录</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <strong>举报详情</strong>
+                <span class="badge" id="reportDetailStatus">未选择</span>
+              </div>
+              <div class="panel-body" id="reportDetail"><div class="empty">请选择左侧举报记录</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-publish">
+          <div class="toolbar">
+            <div class="row">
+              <select id="publishStatus">
+                <option value="">全部发布包</option>
+                <option value="approved">已审核待校验</option>
+                <option value="ready_to_publish">校验通过待发布</option>
+                <option value="pre_publish_blocked">校验阻断</option>
+                <option value="published">已发布</option>
+              </select>
+              <button class="btn secondary" id="loadPublishBtn" type="button">刷新发布中心</button>
+            </div>
+            <label class="row hint"><input id="activateRules" type="checkbox" style="width:16px;height:16px;"> 发布时同步启用候选规则</label>
+          </div>
+          <div class="cards" id="publishList"><div class="empty">暂无发布包</div></div>
+        </section>
+
+        <section class="view" id="view-versions">
+          <div class="toolbar">
+            <button class="btn secondary" id="loadVersionsBtn" type="button">刷新版本</button>
+            <span class="hint">回滚会恢复本次发布前的知识快照，并重建 Milvus 向量库。</span>
+          </div>
+          <div class="cards" id="versionList"><div class="empty">暂无发布版本</div></div>
+        </section>
+
+        <section class="view" id="view-audit">
+          <div class="toolbar">
+            <button class="btn secondary" id="loadAuditBtn" type="button">刷新审计日志</button>
+            <span class="hint">记录登录、提交、审核、发布、回滚等关键动作。</span>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><strong>最近审计记录</strong><span class="badge" id="auditCount">0</span></div>
+            <div class="list" id="auditList"><div class="empty">暂无审计记录</div></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </section>
+
+  <script>
+    const state = {
+      tab: (location.hash || '#reviews').replace('#', '') || 'reviews',
+      user: null,
+      selectedReviewId: '',
+      selectedReviewDetail: null,
+      selectedReportId: '',
+      selectedReportDetail: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const titles = {
+      reviews: ['人工审核', '查看待审核草稿，修改 Agent 结构化结果并作出审核结论'],
+      reports: ['举报中心', '查看一键举报记录，核对研判结果并完成处理标记'],
+      publish: ['发布中心', '只发布审核通过且校验通过的内容'],
+      versions: ['版本回滚', '查看发布历史、影响范围、测试结果并执行回滚'],
+      audit: ['审计概览', '查看关键管理动作记录']
+    };
+    const statusMap = {
+      pending_review: '待审核',
+      need_more_info: '要求补充',
+      rejected: '已驳回',
+      approved: '已通过',
+      ready_to_publish: '待发布',
+      pre_publish_blocked: '校验阻断',
+      published: '已发布',
+      rolled_back: '已回滚',
+      confirmed: '待处理',
+      handled: '已处理',
+      invalid: '无效举报'
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function jsonText(value) {
+      return JSON.stringify(value ?? {}, null, 2);
+    }
+
+    function statusLabel(status) {
+      return statusMap[status] || status || '未知';
+    }
+
+    function badgeClass(status) {
+      if (['approved', 'ready_to_publish', 'published', 'handled'].includes(status)) return 'ok';
+      if (['pending_review', 'need_more_info', 'pre_publish_blocked', 'confirmed'].includes(status)) return 'warn';
+      if (['rejected', 'rolled_back', 'invalid'].includes(status)) return 'bad';
+      return '';
+    }
+
+    async function api(path, options = {}) {
+      const init = {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        ...options
+      };
+      if (init.body && typeof init.body !== 'string') init.body = JSON.stringify(init.body);
+      const res = await fetch(path, init);
+      let data = {};
+      const text = await res.text();
+      if (text) {
+        try { data = JSON.parse(text); } catch { data = { detail: text }; }
+      }
+      if (!res.ok) throw new Error(data.detail || data.message || `HTTP ${res.status}`);
+      return data;
+    }
+
+    function showLogin(message = '') {
+      $('loginView').classList.remove('hidden');
+      $('consoleView').classList.add('hidden');
+      $('loginError').textContent = message;
+    }
+
+    function showConsole() {
+      $('loginView').classList.add('hidden');
+      $('consoleView').classList.remove('hidden');
+      $('userInfo').textContent = `${state.user.display_name || state.user.username} · ${state.user.roles.join(' / ')}`;
+      switchTab(state.tab);
+    }
+
+    async function checkMe() {
+      try {
+        const data = await api('/admin/auth/me');
+        state.user = data.user;
+        showConsole();
+        await refreshCurrent();
+      } catch (error) {
+        showLogin('');
+      }
+    }
+
+    async function login(event) {
+      event.preventDefault();
+      $('loginError').textContent = '';
+      try {
+        const data = await api('/admin/auth/login', {
+          method: 'POST',
+          body: {
+            username: $('username').value.trim(),
+            password: $('password').value
+          }
+        });
+        state.user = data.user;
+        if (data.must_change_password) {
+          $('apiState').textContent = '默认密码待修改';
+          $('apiState').className = 'badge warn';
+        }
+        showConsole();
+        await refreshCurrent();
+      } catch (error) {
+        $('loginError').textContent = error.message || '登录失败';
+      }
+    }
+
+    async function logout() {
+      await api('/admin/auth/logout', { method: 'POST' }).catch(() => {});
+      state.user = null;
+      showLogin('已退出登录');
+    }
+
+    function switchTab(tab) {
+      state.tab = ['reviews', 'reports', 'publish', 'versions', 'audit'].includes(tab) ? tab : 'reviews';
+      location.hash = state.tab;
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === state.tab));
+      document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+      $(`view-${state.tab}`).classList.add('active');
+      $('pageTitle').textContent = titles[state.tab][0];
+      $('pageSubtitle').textContent = titles[state.tab][1];
+    }
+
+    async function loadStats() {
+      const data = await api('/admin/intake/stats');
+      $('statPending').textContent = data.review?.pending_review || 0;
+      $('statReports').textContent = data.reports?.confirmed || 0;
+      $('statReady').textContent = (data.publish?.ready_to_publish || 0) + (data.publish?.approved || 0);
+      $('statKnowledge').textContent = data.formal_knowledge || 0;
+      $('statVersions').textContent = data.versions || 0;
+      $('statRules').textContent = data.rule_candidates || 0;
+    }
+
+    async function refreshCurrent() {
+      await loadStats().catch(() => {});
+      if (state.tab === 'reviews') return loadReviews();
+      if (state.tab === 'reports') return loadReports();
+      if (state.tab === 'publish') return loadPublish();
+      if (state.tab === 'versions') return loadVersions();
+      return loadAudit();
+    }
+
+    async function loadReviews() {
+      const status = $('reviewStatus').value;
+      const data = await api(`/admin/intake/reviews?limit=100&status=${encodeURIComponent(status)}`);
+      $('reviewCount').textContent = data.total || 0;
+      const items = data.items || [];
+      if (!items.length) {
+        $('reviewList').innerHTML = '<div class="empty">暂无审核任务</div>';
+        $('reviewDetail').innerHTML = '<div class="empty">请选择左侧审核任务</div>';
+        $('reviewDetailStatus').textContent = '未选择';
+        return;
+      }
+      $('reviewList').innerHTML = items.map(item => {
+        const profile = item.scam_profile || {};
+        const selected = item.review_id === state.selectedReviewId ? 'selected' : '';
+        return `
+          <article class="item selectable ${selected}" data-review-id="${escapeHtml(item.review_id)}">
+            <div class="item-title">
+              <strong>${escapeHtml(profile.fraud_name || profile.fraud_type || item.review_id)}</strong>
+              <span class="badge ${badgeClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
+            </div>
+            <div class="meta">
+              ${escapeHtml(profile.fraud_type || '类型未知')} · ${escapeHtml(profile.risk_level || '风险未知')}<br>
+              ${escapeHtml(item.updated_at || item.created_at || '')}
+            </div>
+          </article>
+        `;
+      }).join('');
+      if (!state.selectedReviewId || !items.some(item => item.review_id === state.selectedReviewId)) {
+        state.selectedReviewId = items[0].review_id;
+      }
+      await loadReviewDetail(state.selectedReviewId);
+    }
+
+    async function loadReviewDetail(reviewId) {
+      state.selectedReviewId = reviewId;
+      document.querySelectorAll('[data-review-id]').forEach(el => el.classList.toggle('selected', el.dataset.reviewId === reviewId));
+      const detail = await api(`/admin/intake/reviews/${encodeURIComponent(reviewId)}`);
+      state.selectedReviewDetail = detail;
+      renderReviewDetail(detail);
+    }
+
+    function draftForEdit(draft) {
+      return {
+        scam_profile: draft.scam_profile || {},
+        knowledge_items: draft.knowledge_items || [],
+        rule_candidates: draft.rule_candidates || [],
+        test_cases: draft.test_cases || [],
+        agent_notes: draft.agent_notes || [],
+        sanitized_material: draft.sanitized_material || {},
+        field_sources: draft.field_sources || {},
+        missing_required_facts: draft.missing_required_facts || [],
+        completion_assessment: draft.completion_assessment || {}
+      };
+    }
+
+    function renderAiEnrichmentBlock(draft) {
+      const enrichment = draft.ai_enrichment || {};
+      const assessment = enrichment.completion_assessment || draft.completion_assessment || {};
+      const missing = enrichment.missing_required_facts || draft.missing_required_facts || [];
+      const sources = enrichment.field_sources || draft.field_sources || {};
+      const enrichedDraft = enrichment.enriched_draft || {};
+      if (!enrichment.enrichment_id && !Object.keys(sources).length && !missing.length) {
+        return `
+          <div class="field" style="margin-top:14px;">
+            <label>AI补齐标准接入草稿</label>
+            <div class="empty" style="min-height:120px;">人工确认这份材料值得接入后，可点击下方按钮，让大模型补齐为标准骗局知识草稿。</div>
+          </div>
+        `;
+      }
+      return `
+        <div class="field" style="margin-top:14px;">
+          <label>AI补齐标准接入草稿</label>
+          <div class="grid-2">
+            <div class="kv"><span>补齐状态</span><strong>${escapeHtml(enrichment.status || '已应用')}</strong></div>
+            <div class="kv"><span>完整度</span><strong>${escapeHtml(String(assessment.score ?? '-'))} · ${escapeHtml(assessment.level || '')}</strong></div>
+            <div class="kv"><span>生成方式</span><strong>${escapeHtml(enrichment.llm_status || assessment.llm_status || '')}</strong></div>
+            <div class="kv"><span>生成时间</span><strong>${escapeHtml(enrichment.generated_at || '')}</strong></div>
+          </div>
+          <div class="code" style="margin-top:10px;">${escapeHtml(jsonText({
+            summary: enrichment.standardization_summary || assessment.summary || '',
+            missing_required_facts: missing,
+            field_sources: sources,
+            knowledge_count: (enrichedDraft.knowledge_items || draft.knowledge_items || []).length,
+            rule_count: (enrichedDraft.rule_candidates || draft.rule_candidates || []).length,
+            test_case_count: (enrichedDraft.test_cases || draft.test_cases || []).length
+          }))}</div>
+        </div>
+      `;
+    }
+
+    function renderReviewDetail(detail) {
+      const review = detail.review || {};
+      const submission = detail.submission || {};
+      const draft = detail.draft || {};
+      const profile = draft.scam_profile || {};
+      const checks = draft.quality_checks || {};
+      $('reviewDetailStatus').textContent = statusLabel(review.status);
+      $('reviewDetailStatus').className = `badge ${badgeClass(review.status)}`;
+      const blockers = checks.blockers || [];
+      const warnings = checks.warnings || [];
+      $('reviewDetail').innerHTML = `
+        <div class="grid-2">
+          <div class="kv"><span>骗局名称</span><strong>${escapeHtml(profile.fraud_name || '')}</strong></div>
+          <div class="kv"><span>诈骗类型</span><strong>${escapeHtml(profile.fraud_type || '')}</strong></div>
+          <div class="kv"><span>风险等级</span><strong>${escapeHtml(profile.risk_level || '')}</strong></div>
+          <div class="kv"><span>提交编号</span><strong>${escapeHtml(submission.submission_id || '')}</strong></div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>质量校验</label>
+          <div class="code">${escapeHtml(jsonText({
+            passed: checks.passed,
+            blockers,
+            warnings,
+            duplicate_candidates: draft.duplicate_candidates || [],
+            privacy_redactions: submission.privacy_redactions || []
+          }))}</div>
+        </div>
+        ${renderAiEnrichmentBlock(draft)}
+        <div class="field">
+          <label for="draftEditor">Agent 结构化草稿，可人工修改</label>
+          <textarea id="draftEditor" class="json-editor" spellcheck="false">${escapeHtml(jsonText(draftForEdit(draft)))}</textarea>
+        </div>
+        <div class="field">
+          <label for="reviewComment">审核意见</label>
+          <textarea id="reviewComment" placeholder="填写驳回原因、补充要求、通过说明或修改记录..."></textarea>
+        </div>
+        <div class="row">
+          <button class="btn secondary" id="aiEnrichBtn" type="button">AI补齐标准接入草稿</button>
+          <button class="btn secondary" id="aiReEnrichBtn" type="button">重新生成AI补齐</button>
+          <button class="btn success" id="applyAiEnrichBtn" type="button" ${draft.ai_enrichment?.status === 'generated' ? '' : 'disabled'}>应用AI补齐到草稿</button>
+          <button class="btn secondary" id="saveDraftBtn" type="button">保存草稿</button>
+          <button class="btn success" data-review-action="approve" type="button">通过审核</button>
+          <button class="btn warning" data-review-action="need_more_info" type="button">要求补充</button>
+          <button class="btn danger" data-review-action="reject" type="button">驳回</button>
+          <button class="btn secondary" data-review-action="duplicate" type="button">标记重复</button>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>历史评论</label>
+          <div class="code">${escapeHtml(jsonText(detail.comments || []))}</div>
+        </div>
+      `;
+      $('aiEnrichBtn').addEventListener('click', () => generateAiEnrichment(false));
+      $('aiReEnrichBtn').addEventListener('click', () => generateAiEnrichment(true));
+      $('applyAiEnrichBtn').addEventListener('click', applyAiEnrichment);
+      $('saveDraftBtn').addEventListener('click', saveDraft);
+      document.querySelectorAll('[data-review-action]').forEach(btn => {
+        btn.addEventListener('click', () => decideReview(btn.dataset.reviewAction));
+      });
+    }
+
+    async function generateAiEnrichment(force) {
+      if (!state.selectedReviewId) return;
+      const btn = force ? $('aiReEnrichBtn') : $('aiEnrichBtn');
+      const oldText = btn ? btn.textContent : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = force ? '重新生成中...' : '生成中...';
+      }
+      try {
+        await api(`/admin/intake/reviews/${encodeURIComponent(state.selectedReviewId)}/ai-enrich`, {
+          method: 'POST',
+          body: { use_llm: true, force: Boolean(force) }
+        });
+        await loadReviewDetail(state.selectedReviewId);
+        await loadStats();
+      } catch (error) {
+        alert(`AI补齐失败：${error.message || error}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      }
+    }
+
+    async function applyAiEnrichment() {
+      if (!state.selectedReviewId) return;
+      const detail = state.selectedReviewDetail || {};
+      const enrichment = (detail.draft || {}).ai_enrichment || {};
+      if (!enrichment.enrichment_id) {
+        alert('请先生成 AI 补齐草稿');
+        return;
+      }
+      const ok = confirm('确认将 AI 补齐结果应用到当前审核草稿？应用后仍可在编辑框中人工修改。');
+      if (!ok) return;
+      $('applyAiEnrichBtn').disabled = true;
+      try {
+        await api(`/admin/intake/reviews/${encodeURIComponent(state.selectedReviewId)}/ai-enrich/apply`, {
+          method: 'POST',
+          body: { enrichment_id: enrichment.enrichment_id }
+        });
+        await loadReviewDetail(state.selectedReviewId);
+        await loadStats();
+        alert('AI补齐已应用到草稿');
+      } catch (error) {
+        alert(`应用失败：${error.message || error}`);
+      }
+    }
+
+    async function saveDraft() {
+      try {
+        const draft = JSON.parse($('draftEditor').value);
+        await api(`/admin/intake/reviews/${encodeURIComponent(state.selectedReviewId)}/draft`, {
+          method: 'PUT',
+          body: { draft }
+        });
+        await loadReviewDetail(state.selectedReviewId);
+        await loadStats();
+        alert('草稿已保存');
+      } catch (error) {
+        alert(`保存失败：${error.message || error}`);
+      }
+    }
+
+    async function decideReview(action) {
+      try {
+        const comment = $('reviewComment') ? $('reviewComment').value.trim() : '';
+        const data = await api(`/admin/intake/reviews/${encodeURIComponent(state.selectedReviewId)}/decision`, {
+          method: 'POST',
+          body: { action, comment }
+        });
+        if (data.publish_package) alert('审核通过，已生成待发布包');
+        await loadReviews();
+        await loadPublish();
+        await loadStats();
+      } catch (error) {
+        alert(`审核处理失败：${error.message || error}`);
+      }
+    }
+
+    function shortText(value, limit = 90) {
+      const text = String(value ?? '').replace(/\s+/g, ' ').trim();
+      return text.length > limit ? `${text.slice(0, limit)}...` : text;
+    }
+
+    async function loadReports() {
+      const status = $('reportStatus').value;
+      const data = await api(`/admin/reports/tickets?limit=100&status=${encodeURIComponent(status)}`);
+      $('reportCount').textContent = data.total || 0;
+      const items = data.items || [];
+      if (!items.length) {
+        $('reportList').innerHTML = '<div class="empty">暂无举报记录</div>';
+        $('reportDetail').innerHTML = '<div class="empty">请选择左侧举报记录</div>';
+        $('reportDetailStatus').textContent = '未选择';
+        state.selectedReportId = '';
+        return;
+      }
+      $('reportList').innerHTML = items.map(item => {
+        const selected = item.report_id === state.selectedReportId ? 'selected' : '';
+        return `
+          <article class="item selectable ${selected}" data-report-id="${escapeHtml(item.report_id)}">
+            <div class="item-title">
+              <strong>${escapeHtml(item.suspected_type || item.report_type || item.report_id)}</strong>
+              <span class="badge ${badgeClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
+            </div>
+            <div class="meta">
+              ${escapeHtml(item.report_id)} · ${escapeHtml(item.risk_level || '风险未知')} · ${escapeHtml(String(item.risk_score ?? 0))}分<br>
+              ${escapeHtml(shortText(item.content || (item.urls || []).join('、') || '暂无内容'))}<br>
+              ${escapeHtml(item.confirmed_at || item.created_at || '')}
+            </div>
+          </article>
+        `;
+      }).join('');
+      if (!state.selectedReportId || !items.some(item => item.report_id === state.selectedReportId)) {
+        state.selectedReportId = items[0].report_id;
+      }
+      await loadReportDetail(state.selectedReportId);
+    }
+
+    async function loadReportDetail(reportId) {
+      state.selectedReportId = reportId;
+      document.querySelectorAll('[data-report-id]').forEach(el => el.classList.toggle('selected', el.dataset.reportId === reportId));
+      const detail = await api(`/admin/reports/tickets/${encodeURIComponent(reportId)}`);
+      state.selectedReportDetail = detail.ticket;
+      renderReportDetail(detail.ticket);
+    }
+
+    function renderReportDetail(ticket) {
+      const reportIntel = ticket.report_intel || {};
+      const urlFeatures = ticket.url_features || {};
+      const keyword = ticket.keyword_blacklist || {};
+      const llm = ticket.llm_analysis || ticket.semantic_analysis || {};
+      $('reportDetailStatus').textContent = statusLabel(ticket.status);
+      $('reportDetailStatus').className = `badge ${badgeClass(ticket.status)}`;
+      $('reportDetail').innerHTML = `
+        <div class="grid-2">
+          <div class="kv"><span>举报编号</span><strong>${escapeHtml(ticket.report_id || '')}</strong></div>
+          <div class="kv"><span>研判编号</span><strong>${escapeHtml(ticket.analysis_id || '')}</strong></div>
+          <div class="kv"><span>风险等级</span><strong>${escapeHtml(ticket.risk_level || '')} · ${escapeHtml(String(ticket.risk_score ?? 0))}分</strong></div>
+          <div class="kv"><span>涉诈类型</span><strong>${escapeHtml(ticket.suspected_type || ticket.fraud_type || ticket.scam_type || '')}</strong></div>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>举报内容</label>
+          <div class="code">${escapeHtml(ticket.content || ticket.raw_user_content || '')}</div>
+        </div>
+        <div class="field">
+          <label>涉及链接 / 联系方式</label>
+          <div class="code">${escapeHtml(jsonText({
+            urls: ticket.urls || [],
+            phones: ticket.phones || [],
+            accounts: ticket.accounts || []
+          }))}</div>
+        </div>
+        <div class="field">
+          <label>初步研判</label>
+          <div class="code">${escapeHtml(jsonText({
+            display_summary: reportIntel.display_summary || ticket.display_summary || '',
+            matched_rules: ticket.matched_rules || [],
+            url_rule_hits: urlFeatures.rule_hits || [],
+            keyword_rule_hits: keyword.rule_hits || [],
+            semantic_features: llm.semantic_features || [],
+            recommended_actions: ticket.advice || ticket.recommended_actions || [],
+            evidence_requirements: ticket.evidence_requirements || []
+          }))}</div>
+        </div>
+        <div class="field">
+          <label>处理备注</label>
+          <textarea id="reportHandleNote" placeholder="填写核查结果、处理说明或无效原因...">${escapeHtml(ticket.handler_note || '')}</textarea>
+        </div>
+        <div class="row">
+          <button class="btn success" data-report-status="handled" type="button">标记已处理</button>
+          <button class="btn danger" data-report-status="invalid" type="button">标记无效</button>
+          <button class="btn secondary" data-report-status="confirmed" type="button">重新打开</button>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>完整记录</label>
+          <div class="code">${escapeHtml(jsonText(ticket))}</div>
+        </div>
+      `;
+      document.querySelectorAll('[data-report-status]').forEach(btn => {
+        btn.addEventListener('click', () => updateReportStatus(btn.dataset.reportStatus));
+      });
+    }
+
+    async function updateReportStatus(status) {
+      if (!state.selectedReportId) return;
+      try {
+        await api(`/admin/reports/tickets/${encodeURIComponent(state.selectedReportId)}/status`, {
+          method: 'POST',
+          body: {
+            status,
+            note: $('reportHandleNote') ? $('reportHandleNote').value.trim() : ''
+          }
+        });
+        await loadReports();
+        await loadStats();
+      } catch (error) {
+        alert(`处理举报失败：${error.message || error}`);
+      }
+    }
+
+    async function loadPublish() {
+      const status = $('publishStatus').value;
+      const data = await api(`/admin/intake/publish?limit=100&status=${encodeURIComponent(status)}`);
+      const items = data.items || [];
+      if (!items.length) {
+        $('publishList').innerHTML = '<div class="empty">暂无发布包</div>';
+        return;
+      }
+      $('publishList').innerHTML = items.map(item => {
+        const checks = item.pre_publish_checks || {};
+        return `
+          <article class="item">
+            <div class="item-title">
+              <strong>${escapeHtml(item.scam_profile?.fraud_name || item.scam_profile?.fraud_type || item.publish_id)}</strong>
+              <span class="badge ${badgeClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
+            </div>
+            <div class="meta">
+              发布包：${escapeHtml(item.publish_id)}<br>
+              知识条目：${(item.knowledge_items || []).length} · 规则候选：${(item.rule_candidates || []).length} · 测试样例：${(item.test_cases || []).length}<br>
+              更新时间：${escapeHtml(item.updated_at || item.created_at || '')}
+            </div>
+            <div class="code">${escapeHtml(jsonText({
+              passed: checks.passed,
+              blockers: checks.blockers || [],
+              warnings: checks.warnings || [],
+              test_result: checks.test_result || {}
+            }))}</div>
+            <div class="row">
+              <button class="btn secondary" data-publish-check="${escapeHtml(item.publish_id)}" type="button">发布前校验</button>
+              <button class="btn success" data-publish-run="${escapeHtml(item.publish_id)}" type="button">正式发布</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+      document.querySelectorAll('[data-publish-check]').forEach(btn => btn.addEventListener('click', () => checkPublish(btn.dataset.publishCheck)));
+      document.querySelectorAll('[data-publish-run]').forEach(btn => btn.addEventListener('click', () => runPublish(btn.dataset.publishRun)));
+    }
+
+    async function checkPublish(publishId) {
+      try {
+        await api(`/admin/intake/publish/${encodeURIComponent(publishId)}/check`, { method: 'POST' });
+        await loadPublish();
+        await loadStats();
+      } catch (error) {
+        alert(`校验失败：${error.message || error}`);
+      }
+    }
+
+    async function runPublish(publishId) {
+      const ok = confirm('确认正式发布？发布会写入正式知识库并重建 Milvus 向量库。');
+      if (!ok) return;
+      try {
+        await api(`/admin/intake/publish/${encodeURIComponent(publishId)}/publish`, {
+          method: 'POST',
+          body: { activate_rules: $('activateRules').checked }
+        });
+        await loadPublish();
+        await loadVersions();
+        await loadStats();
+        alert('发布完成');
+      } catch (error) {
+        alert(`发布失败：${error.message || error}`);
+      }
+    }
+
+    async function loadVersions() {
+      const data = await api('/admin/intake/versions?limit=100');
+      const items = data.items || [];
+      if (!items.length) {
+        $('versionList').innerHTML = '<div class="empty">暂无发布版本</div>';
+        return;
+      }
+      $('versionList').innerHTML = items.map(item => `
+        <article class="item">
+          <div class="item-title">
+            <strong>${escapeHtml(item.version_id)}</strong>
+            <span class="badge ${badgeClass(item.status)}">${escapeHtml(statusLabel(item.status))}</span>
+          </div>
+          <div class="meta">
+            ${escapeHtml(item.scam_profile?.fraud_name || item.scam_profile?.fraud_type || '')}<br>
+            发布人：${escapeHtml(item.published_by?.username || '')} · 发布时间：${escapeHtml(item.published_at || '')}
+          </div>
+          <div class="code">${escapeHtml(jsonText({
+            impact_scope: item.impact_scope || {},
+            pre_publish_checks: item.pre_publish_checks || {},
+            milvus_result: item.milvus_result || {}
+          }))}</div>
+          <div class="row">
+            <button class="btn danger" data-version-rollback="${escapeHtml(item.version_id)}" ${item.status === 'rolled_back' ? 'disabled' : ''} type="button">回滚版本</button>
+          </div>
+        </article>
+      `).join('');
+      document.querySelectorAll('[data-version-rollback]').forEach(btn => btn.addEventListener('click', () => rollbackVersion(btn.dataset.versionRollback)));
+    }
+
+    async function rollbackVersion(versionId) {
+      const reason = prompt('请输入回滚原因');
+      if (reason === null) return;
+      try {
+        await api(`/admin/intake/versions/${encodeURIComponent(versionId)}/rollback`, {
+          method: 'POST',
+          body: { reason }
+        });
+        await loadVersions();
+        await loadStats();
+        alert('回滚完成');
+      } catch (error) {
+        alert(`回滚失败：${error.message || error}`);
+      }
+    }
+
+    async function loadAudit() {
+      const data = await api('/admin/intake/audit?limit=80');
+      const items = data.items || [];
+      $('auditCount').textContent = items.length;
+      if (!items.length) {
+        $('auditList').innerHTML = '<div class="empty">暂无审计记录</div>';
+        return;
+      }
+      $('auditList').innerHTML = items.map(item => `
+        <article class="item">
+          <div class="item-title">
+            <strong>${escapeHtml(item.event_type || '')}</strong>
+            <span class="badge">${escapeHtml(item.created_at || '')}</span>
+          </div>
+          <div class="code">${escapeHtml(jsonText(item.payload || {}))}</div>
+        </article>
+      `).join('');
+    }
+
+    $('loginForm').addEventListener('submit', login);
+    $('logoutBtn').addEventListener('click', logout);
+    $('refreshAllBtn').addEventListener('click', refreshCurrent);
+    $('loadReviewsBtn').addEventListener('click', loadReviews);
+    $('reviewStatus').addEventListener('change', loadReviews);
+    $('loadReportsBtn').addEventListener('click', loadReports);
+    $('reportStatus').addEventListener('change', loadReports);
+    $('loadPublishBtn').addEventListener('click', loadPublish);
+    $('publishStatus').addEventListener('change', loadPublish);
+    $('loadVersionsBtn').addEventListener('click', loadVersions);
+    $('loadAuditBtn').addEventListener('click', loadAudit);
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        switchTab(btn.dataset.tab);
+        await refreshCurrent();
+      });
+    });
+    $('reviewList').addEventListener('click', event => {
+      const row = event.target.closest('[data-review-id]');
+      if (row) loadReviewDetail(row.dataset.reviewId);
+    });
+    $('reportList').addEventListener('click', event => {
+      const row = event.target.closest('[data-report-id]');
+      if (row) loadReportDetail(row.dataset.reportId);
+    });
+    window.addEventListener('hashchange', () => {
+      const next = (location.hash || '#reviews').replace('#', '');
+      if (next !== state.tab) {
+        switchTab(next);
+        refreshCurrent();
+      }
+    });
+
+    if (new URLSearchParams(window.location.search).get('capture') === '1') {
+      document.body.classList.add('capture-mode');
+    }
+    checkMe();
+  </script>
+</body>
+</html>
